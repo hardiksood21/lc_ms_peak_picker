@@ -1,0 +1,11 @@
+name: lc-ms-peak-picker
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - r-base=4.3.2
+  - r-optparse
+  - bioconductor-xcms
+  - bioconductor-msnbase
+  - jupyter
+  - r-irkernel
