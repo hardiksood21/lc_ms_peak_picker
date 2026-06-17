@@ -1,0 +1,91 @@
+<tool id="lc_ms_peak_picker" name="LC-MS Peak Picker" version="2.0.0" profile="23.0">
+    <description>XCMS CentWave peak detection from raw LC-MS data (.mzML or .mzXML)</description>
+    <requirements>
+        <requirement type="package" version="4.3.2">r-base</requirement>
+        <requirement type="package">bioconductor-xcms</requirement>
+        <requirement type="package">bioconductor-msnbase</requirement>
+    </requirements>
+    <command detect_errors="exit_code"><![CDATA[ 
+        Rscript '${__tool_directory__}/lc_ms_peak_picker.R' --input '$input_file' --output '$output_peaks' --ppm $ppm --sn $sn --min_pw $min_pw --max_pw $max_pw --pref_k $pref_k --pref_i $pref_i --sample_name '${input_file.element_identifier}' 
+    ]]></command>
+    <inputs>
+        <param name="input_file" type="data" format="mzml,mzxml" label="Raw LC-MS file" help="Upload a single .mzML or .mzXML file. Use Galaxy collections to process multiple files in batch."/>
+        <section name="centwave" title="CentWave Parameters" expanded="true">
+            <param name="ppm" type="float" value="15" min="1" max="100" label="PPM error margin" help="Mass accuracy tolerance in parts per million. Default: 15"/>
+            <param name="sn" type="float" value="1.5" min="0" label="Signal-to-noise threshold" help="Minimum signal-to-noise ratio for peak detection. Default: 1.5"/>
+            <param name="min_pw" type="float" value="5" min="1" label="Minimum peakwidth (seconds)" help="Shortest expected chromatographic peak. Default: 5"/>
+            <param name="max_pw" type="float" value="20" min="1" label="Maximum peakwidth (seconds)" help="Longest expected peak. Increase to 60+ for lipids. Default: 20"/>
+            <param name="pref_k" type="integer" value="0" min="0" label="Prefilter: k (minimum scans)" help="Minimum number of scans above intensity threshold. Default: 0"/>
+            <param name="pref_i" type="float" value="0" min="0" label="Prefilter: I (minimum intensity)" help="Minimum intensity threshold for prefilter. Default: 0"/>
+        </section>
+    </inputs>
+    <outputs>
+        <data name="output_peaks" format="tabular" label="${tool.name} on ${on_string}: peaks"/>
+    </outputs>
+    <tests>
+        <test>
+            <param name="input_file" value="metabolite_test.mzML"/>
+            <section name="centwave">
+                <param name="ppm" value="15"/>
+                <param name="sn" value="1.5"/>
+                <param name="min_pw" value="5"/>
+                <param name="max_pw" value="20"/>
+                <param name="pref_k" value="0"/>
+                <param name="pref_i" value="0"/>
+            </section>
+            <output name="output_peaks" file="processed_results.peaks" compare="sim_size" delta="1000"/>
+        </test>
+    </tests>
+<help><![CDATA[
+**LC-MS Peak Picker**
+=====================
+Identifies mass spectrometry peaks from raw LC-MS data using the XCMS CentWave algorithm. 
+        
+**Inputs**
+----------
+- A single **.mzML** or **.mzXML** file from LC-MS acquisition. 
+- To process multiple files, create a **Dataset Collection** in Galaxy and map this tool over it. 
+        
+**Output**
+----------
+A tab-separated **.peaks** file with one row per detected peak, containing: 
+        
+======== ================================================================ 
+Column   Description 
+======== ================================================================ 
+mz       Detected m/z value 
+mzmin    Minimum m/z of the peak 
+mzmax    Maximum m/z of the peak 
+rt       Retention time (seconds) at peak apex 
+rtmin    Retention time at peak start 
+rtmax    Retention time at peak end 
+into     Integrated peak intensity 
+intb     Baseline-corrected integrated intensity 
+maxo     Maximum peak intensity 
+sn       Signal-to-noise ratio 
+sample   Sample name (from input filename) 
+======== ================================================================ 
+        
+**Parameters**
+--------------
+- **PPM error margin**: Mass accuracy of your instrument. Typical values: 5–15 ppm for Orbitrap, 15–25 ppm for Q-TOF. 
+- **S/N threshold**: Lower values detect more peaks but increase false positives. 
+- **Peakwidth**: Set based on your chromatographic method. Increase max for lipid analyses. 
+- **Prefilter**: Leave at 0,0 for maximum sensitivity. 
+        
+**Batch processing**
+--------------------
+To process an entire experiment: 
+1. Upload all .mzML/.mzXML files to Galaxy 
+2. Select them all → **Build Dataset Collection** 3. Run this tool with **Apply to Collection** 4. All .peaks files are generated in parallel on Galaxy's HPC 
+        
+**References**
+--------------
+1. Tautenhahn R, Böttcher C, Neumann S. (2008). *Highly sensitive feature detection for high resolution LC/MS.* BMC Bioinformatics, 9:504. 
+2. Smith CA, et al. (2006). *XCMS: processing mass spectrometry data for metabolite profiling.* Anal. Chem., 78(3):779–787. 
+]]></help>
+    <citations>
+        <citation type="doi">10.1186/1471-2105-9-504</citation>
+        <citation type="doi">10.1021/ac051437y</citation>
+    </citations>
+</tool>

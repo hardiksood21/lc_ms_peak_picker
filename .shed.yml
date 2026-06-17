@@ -1,0 +1,16 @@
+name: lc_ms_peak_picker
+owner: hardiksood21
+description: XCMS CentWave peak detection from raw LC-MS data (.mzML/.mzXML)
+long_description: |
+  Identifies mass spectrometry peaks from raw LC-MS data using the XCMS CentWave algorithm.
+  Supports .mzML and .mzXML formats, configurable PPM tolerance, S/N threshold, peakwidth,
+  and prefilter parameters. Outputs a tab-separated peaks file suitable for downstream
+  processing in metabolomics workflows.
+
+remote_repository_url: https://github.com/hardiksood21/lc_ms_peak_picker
+homepage_url: https://github.com/hardiksood21/lc_ms_peak_picker
+type: unrestricted
+categories:
+  - Metabolomics
+  - Proteomics
+  - Mass Spectrometry
